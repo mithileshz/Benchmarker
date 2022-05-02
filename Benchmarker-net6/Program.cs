@@ -1,6 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using BenchmarkDotNet.Running;
-using Benchmarks.Benchmarks;
+using System;
+//using Benchmarks.Benchmarks;
 
-BenchmarkRunner.Run<InitialisingEmptyArray>();
+//BenchmarkRunner.Run<InitialisingEmptyArray>();
+
+Console.WriteLine("Hello World");

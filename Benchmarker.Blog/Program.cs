@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 var benchmarksNamespace = "Benchmarks.Benchmarks";
 
-IEnumerable<Type> benchmarks = typeof(Benchmarks.Benchmarks.InitialisingEmptyArray).Assembly.GetTypes().Where(t => t.Namespace != null && t.Namespace.Equals(benchmarksNamespace));
+IEnumerable<Type> benchmarks = null;// typeof(Benchmarks.Benchmarks.InitialisingEmptyArray).Assembly.GetTypes().Where(t => t.Namespace != null && t.Namespace.Equals(benchmarksNamespace));
 
 foreach(var t in benchmarks)
 {

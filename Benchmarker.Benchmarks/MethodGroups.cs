@@ -3,7 +3,7 @@ using BenchmarkDotNet.Jobs;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Benchmarks.Benchmarks
+namespace Benchmarker.Benchmarks
 {
     [SimpleJob(RuntimeMoniker.CoreRt50)]
     [SimpleJob(RuntimeMoniker.CoreRt60)]

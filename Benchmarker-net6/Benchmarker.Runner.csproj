@@ -3,7 +3,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
-        <RootNamespace>Benchmarker_net6</RootNamespace>
+        <RootNamespace>Benchmarker.Runner</RootNamespace>
         <ImplicitUsings>false</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Benchmarker-Core\Benchmarker.Core.csproj" />
+      <ProjectReference Include="..\Benchmarker.Benchmarks\Benchmarker.Benchmarks.csproj" />
     </ItemGroup>
 
 </Project>

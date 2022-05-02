@@ -3,7 +3,7 @@ using BenchmarkDotNet.Jobs;
 using Benchmarker.Core;
 using System;
 
-namespace Benchmarks.Benchmarks
+namespace Benchmarker.Benchmarks
 {
     [Title(".NET 6 Benchmarks - Initialising Empty Array")]
     [Introduction(@"
