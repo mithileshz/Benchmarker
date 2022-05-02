@@ -5,3 +5,5 @@ using System;
 //using Benchmarks.Benchmarks;
 
 //BenchmarkRunner.Run<InitialisingEmptyArray>();
+
+Console.Write("Hello world");

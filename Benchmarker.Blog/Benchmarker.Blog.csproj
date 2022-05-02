@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benchmarker-Core\Benchmarker.Core.csproj" />
-    <ProjectReference Include="..\Benchmarker-net6\Benchmarker.Runner.csproj" />
+    <ProjectReference Include="..\Benchmarker.Core\Benchmarker.Core.csproj" />
+    <ProjectReference Include="..\Benchmarker.Runner\Benchmarker.Runner.csproj" />
   </ItemGroup>
 
 </Project>
