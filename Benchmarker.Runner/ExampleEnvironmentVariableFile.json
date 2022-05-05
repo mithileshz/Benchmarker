@@ -1,7 +1,9 @@
 {
   "EnvironmentName": "Dev",
   "AzureCosmosDB": {
-    "ConnectionString": "",
-    "DatabaseName": "Dev"
+    "Uri": "",
+    "PrimaryKey": "",
+    "DatabaseName": "Dev",
+    "BenchmarkDetailsContainer": "BenchmarkDetails"
   }
 }

@@ -1,10 +1,12 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using Benchmarker.Core;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Benchmarker.Benchmarks
 {
+    //[Version(1)]
     [SimpleJob(RuntimeMoniker.CoreRt60)]
     [MemoryDiagnoser()]
     public class MethodGroups
