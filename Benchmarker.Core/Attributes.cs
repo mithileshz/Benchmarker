@@ -27,4 +27,15 @@ namespace Benchmarker.Core
             this.Text = text;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    public sealed class VersionAttribute : Attribute
+    {
+        public int Version { get; set; }
+
+        public VersionAttribute(int version)
+        {
+            Version = version;
+        }
+    }
 }

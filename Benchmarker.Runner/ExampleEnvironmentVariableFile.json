@@ -1,0 +1,7 @@
+{
+  "EnvironmentName": "Dev",
+  "AzureCosmosDB": {
+    "ConnectionString": "",
+    "DatabaseName": "Dev"
+  }
+}

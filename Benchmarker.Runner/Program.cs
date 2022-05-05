@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Running;
 using Benchmarker.Benchmarks;
+using Benchmarker.Core;
 using Microsoft.Azure.Cosmos;
 using System;
 
@@ -22,29 +23,3 @@ await container.CreateItemAsync(new
 });
 
 BenchmarkRunner.Run<MethodGroups>();
-
-class Config
-{
-    public string EnvironmentName { get; set; }
-
-    public AzureCosmosDB AzureCosmosDB { get; set; }
-
-    public Config(string environmentName, AzureCosmosDB azureCosmosDB)
-    {
-        EnvironmentName = environmentName;
-        AzureCosmosDB = azureCosmosDB;
-    }   
-}
-
-class AzureCosmosDB
-{
-    public string ConnectionString { get; set; }
-
-    public string DatabaseName { get; set; }
-
-    public AzureCosmosDB(string connectionString, string databaseName)
-    {
-        ConnectionString = connectionString;
-        DatabaseName = databaseName;
-    }   
-}
