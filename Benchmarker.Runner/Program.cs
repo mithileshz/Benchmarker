@@ -59,28 +59,10 @@ async Task RunBenchmarkAndSave(BenchmarkDetail implementedBenchmark, Database da
         fullBenchmarkDetail.Resource.Results.Add(new BenchmarkSummary
         {
             Version = latestVersion,
-            Summary = (BenchmarkDotNet.Reports.Summary)results
+            Summary = results
         });
 
-        await benchmarkDetailsContainer.UpsertItemAsync(fullBenchmarkDetail.Resource);
-
-        //var sqlQuery = $"SELECT * FROM c WHERE ID = {implementedBenchmark.ID}";
-
-        //QueryDefinition queryDefinition = new QueryDefinition(sqlQuery);
-
-        //FeedIterator<BenchmarkDetail> queryResultSetIterator = benchmarkDetailsContainer.GetItemQueryIterator<BenchmarkDetail>(queryDefinition);
-
-        //List<BenchmarkDetail> benchmarkHeaders = new List<BenchmarkDetail>();
-
-        //while (queryResultSetIterator.HasMoreResults)
-        //{
-        //    FeedResponse<BenchmarkDetail> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-
-        //    foreach (var benchmarkHeader in currentResultSet)
-        //    {
-        //        benchmarkHeaders.Add(benchmarkHeader);
-        //    }
-        //}
+        await benchmarkDetailsContainer.UpsertItemAsync(fullBenchmarkDetail.Resource, new PartitionKey(fullBenchmarkDetail.Resource.Id));
     }
     catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
     {
@@ -96,7 +78,7 @@ async Task RunBenchmarkAndSave(BenchmarkDetail implementedBenchmark, Database da
                 new BenchmarkSummary
                 {
                     Version = latestVersion,
-                    Summary = (BenchmarkDotNet.Reports.Summary)results
+                    Summary = results
                 }
             }
         };
