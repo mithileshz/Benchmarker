@@ -6,7 +6,8 @@ using System.Linq;
 
 namespace Benchmarker.Benchmarks
 {
-    //[Version(1)]
+    [Version(1)]
+    [JsonExporterAttribute.Full]
     [SimpleJob(RuntimeMoniker.CoreRt60)]
     [MemoryDiagnoser()]
     public class MethodGroups

@@ -2,20 +2,23 @@
 using BenchmarkDotNet.Jobs;
 using Benchmarker.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Benchmarker.Benchmarks
 {
-    //[Version(1)]
+    [Version(1)]
     [SimpleJob(RuntimeMoniker.CoreRt50)]
     [SimpleJob(RuntimeMoniker.CoreRt60)]
     [MemoryDiagnoser()]
     [MarkdownExporterAttribute.GitHub]
+    [JsonExporterAttribute.Full]
     public class EmptyString
     {
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            _ = string.Empty;
+        }
+
         [Benchmark]
         public string StringEmpty()
         {

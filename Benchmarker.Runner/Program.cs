@@ -1,197 +1,206 @@
-﻿using BenchmarkDotNet.Running;
+﻿//using BenchmarkDotNet.Running;
+//using Benchmarker.Benchmarks;
+//using Benchmarker.Core;
+//using Microsoft.Azure.Cosmos;
+//using Newtonsoft.Json;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Reflection;
+//using System.Security.Cryptography;
+//using System.Text;
+//using System.Threading.Tasks;
+
+using BenchmarkDotNet.Running;
 using Benchmarker.Benchmarks;
-using Benchmarker.Core;
-using Microsoft.Azure.Cosmos;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
-var config = GetConfigFromEnvironmentVariables();
+var results = BenchmarkRunner.Run<EmptyString>();
 
-Database database = await GetDatabase(config);
+//var config = GetConfigFromEnvironmentVariables();
 
-List<BenchmarkDetail> benchmarksInTheCodebase = GetAllBenchmarkDetailsInCodebaseViaReflection();
+//Database database = await GetDatabase(config);
 
-List<BenchmarkDetail> benchmarksFromDb = await GetAllBenchmarkDetailsFromDb(benchmarksInTheCodebase, config, database);
+//List<BenchmarkDetail> benchmarksInTheCodebase = GetAllBenchmarkDetailsInCodebaseViaReflection();
 
-foreach(BenchmarkDetail implementedBenchmark in benchmarksInTheCodebase)
-{
-    BenchmarkDetail? benchmarkDb = benchmarksFromDb.FirstOrDefault(benchmark => benchmark.Id == implementedBenchmark.Id);
+//List<BenchmarkDetail> benchmarksFromDb = new List<BenchmarkDetail>();// await GetAllBenchmarkDetailsFromDb(benchmarksInTheCodebase, config, database);
 
-    if (benchmarkDb == null)
-    {
-        await RunBenchmarkAndSave(implementedBenchmark, database);
-    } 
-    else
-    {
-        if (IsBenchmarkUpdated(implementedBenchmark, benchmarkDb))
-        {
-            await RunBenchmarkAndSave(implementedBenchmark, database);
-        }
-        else
-        {
-            continue;
-        }
-    }
-}
+//foreach(BenchmarkDetail implementedBenchmark in benchmarksInTheCodebase)
+//{
+//    BenchmarkDetail? benchmarkDb = benchmarksFromDb.FirstOrDefault(benchmark => benchmark.Id == implementedBenchmark.Id);
 
-async Task RunBenchmarkAndSave(BenchmarkDetail implementedBenchmark, Database database)
-{
-    var results = BenchmarkRunner.Run(implementedBenchmark.Type);
+//    if (benchmarkDb == null)
+//    {
+//        await RunBenchmarkAndSave(implementedBenchmark, database);
+//    } 
+//    else
+//    {
+//        if (IsBenchmarkUpdated(implementedBenchmark, benchmarkDb))
+//        {
+//            await RunBenchmarkAndSave(implementedBenchmark, database);
+//        }
+//        else
+//        {
+//            continue;
+//        }
+//    }
+//}
 
-    if (results == null)
-        throw new InvalidProgramException($"{implementedBenchmark.FullName} benchmark ran incorrectly. There were no results");
+//async Task RunBenchmarkAndSave(BenchmarkDetail implementedBenchmark, Database database)
+//{
+//    var results = BenchmarkRunner.Run(implementedBenchmark.Type);
 
-    Container benchmarkDetailsContainer = await database.CreateContainerIfNotExistsAsync(config.AzureCosmosDB.BenchmarkDetailsContainer, "/id");
+//    if (results == null)
+//        throw new InvalidProgramException($"{implementedBenchmark.FullName} benchmark ran incorrectly. There were no results");
 
-    var latestVersion = ((VersionAttribute)implementedBenchmark.Type.GetCustomAttributes(false).First(attr => attr.GetType().Equals(typeof(VersionAttribute)))).Version;
+//    Container benchmarkDetailsContainer = await database.CreateContainerIfNotExistsAsync(config.AzureCosmosDB.BenchmarkDetailsContainer, "/id");
 
-    try
-    {
-        ItemResponse<BenchmarkDetail> fullBenchmarkDetail = await benchmarkDetailsContainer.ReadItemAsync<BenchmarkDetail>(implementedBenchmark.Id, new PartitionKey(implementedBenchmark.Id));
+//    var latestVersion = ((VersionAttribute)implementedBenchmark.Type.GetCustomAttributes(false).First(attr => attr.GetType().Equals(typeof(VersionAttribute)))).Version;
 
-        fullBenchmarkDetail.Resource.LastRunVersion = latestVersion;
-        fullBenchmarkDetail.Resource.Results.Add(new BenchmarkSummary
-        {
-            Version = latestVersion,
-            Summary = results
-        });
+//    try
+//    {
+//        ItemResponse<BenchmarkDetail> fullBenchmarkDetail = await benchmarkDetailsContainer.ReadItemAsync<BenchmarkDetail>(implementedBenchmark.Id, new PartitionKey(implementedBenchmark.Id));
 
-        await benchmarkDetailsContainer.UpsertItemAsync(fullBenchmarkDetail.Resource, new PartitionKey(fullBenchmarkDetail.Resource.Id));
-    }
-    catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-    {
-        var newBenchmarkDetail = new BenchmarkDetail
-        {
-            Id = implementedBenchmark.Id,
-            Name = implementedBenchmark.Name,
-            FullName = implementedBenchmark.FullName,
-            Type = implementedBenchmark.Type,
-            LastRunVersion = latestVersion,
-            Results = new List<BenchmarkSummary>
-            {
-                new BenchmarkSummary
-                {
-                    Version = latestVersion,
-                    Summary = results
-                }
-            }
-        };
+//        fullBenchmarkDetail.Resource.LastRunVersion = latestVersion;
+//        fullBenchmarkDetail.Resource.Results.Add(new BenchmarkSummary
+//        {
+//            Version = latestVersion,
+//            Summary = System.IO.File.ReadAllText(results.ResultsDirectoryPath)
+//        });
 
-        await benchmarkDetailsContainer.CreateItemAsync(newBenchmarkDetail, new PartitionKey(newBenchmarkDetail.Id));
-    }
-}
+//        Console.WriteLine(results.ResultsDirectoryPath);
 
-bool IsBenchmarkUpdated(BenchmarkDetail implementedBenchmark, BenchmarkDetail benchmarkDb)
-{
-    return implementedBenchmark.LastRunVersion != benchmarkDb.LastRunVersion;
-}
+//        await benchmarkDetailsContainer.UpsertItemAsync(fullBenchmarkDetail.Resource, new PartitionKey(fullBenchmarkDetail.Resource.Id));
+//    }
+//    catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+//    {
+//        var newBenchmarkDetail = new BenchmarkDetail
+//        {
+//            Id = implementedBenchmark.Id,
+//            Name = implementedBenchmark.Name,
+//            FullName = implementedBenchmark.FullName,
+//            Type = implementedBenchmark.Type,
+//            LastRunVersion = latestVersion,
+//            Results = new List<BenchmarkSummary>
+//            {
+//                new BenchmarkSummary
+//                {
+//                    Version = latestVersion,
+//                    Summary = System.IO.File.ReadAllText(results.ResultsDirectoryPath)
+//                }
+//            }
+//        };
 
-Config GetConfigFromEnvironmentVariables()
-{
-    var configJson = Environment.GetEnvironmentVariable("BenchmarkerConfig", EnvironmentVariableTarget.User);
+//        Console.WriteLine(results.ResultsDirectoryPath);
 
-    if (configJson == null)
-        throw new InvalidProgramException("BenchmarkerConfig environment variable not set.");
+//        await benchmarkDetailsContainer.CreateItemAsync(newBenchmarkDetail, new PartitionKey(newBenchmarkDetail.Id));
+//    }
+//}
 
-    var config = System.Text.Json.JsonSerializer.Deserialize<Config>(configJson);
+//bool IsBenchmarkUpdated(BenchmarkDetail implementedBenchmark, BenchmarkDetail benchmarkDb)
+//{
+//    return implementedBenchmark.LastRunVersion != benchmarkDb.LastRunVersion;
+//}
 
-    if (config == null)
-        throw new ArgumentNullException(nameof(config));
+//Config GetConfigFromEnvironmentVariables()
+//{
+//    var configJson = Environment.GetEnvironmentVariable("BenchmarkerConfig", EnvironmentVariableTarget.User);
 
-    return config;
-}
+//    if (configJson == null)
+//        throw new InvalidProgramException("BenchmarkerConfig environment variable not set.");
 
-async Task<Database> GetDatabase(Config config)
-{
-    var cosmos = new CosmosClient(config.AzureCosmosDB.Uri, config.AzureCosmosDB.PrimaryKey);
+//    var config = System.Text.Json.JsonSerializer.Deserialize<Config>(configJson);
 
-    Database database = await cosmos.CreateDatabaseIfNotExistsAsync(config.AzureCosmosDB.DatabaseName);
+//    if (config == null)
+//        throw new ArgumentNullException(nameof(config));
 
-    return database;
-}
+//    return config;
+//}
 
-async Task<List<BenchmarkDetail>> GetAllBenchmarkDetailsFromDb(List<BenchmarkDetail> implementedBenchmarks, Config config, Database database)
-{
-    Container benchmarkDetailsContainer = await database.CreateContainerIfNotExistsAsync(config.AzureCosmosDB.BenchmarkDetailsContainer, "/id");
+//async Task<Database> GetDatabase(Config config)
+//{
+//    var cosmos = new CosmosClient(config.AzureCosmosDB.Uri, config.AzureCosmosDB.PrimaryKey);
 
-    var sqlQuery = "SELECT c.id, c.Name, c.FullName, c.LastRunVersion FROM c";
+//    Database database = await cosmos.CreateDatabaseIfNotExistsAsync(config.AzureCosmosDB.DatabaseName);
 
-    QueryDefinition queryDefinition = new QueryDefinition(sqlQuery);
+//    return database;
+//}
 
-    FeedIterator<BenchmarkDetail> queryResultSetIterator = benchmarkDetailsContainer.GetItemQueryIterator<BenchmarkDetail>(queryDefinition);
+//async Task<List<BenchmarkDetail>> GetAllBenchmarkDetailsFromDb(List<BenchmarkDetail> implementedBenchmarks, Config config, Database database)
+//{
+//    Container benchmarkDetailsContainer = await database.CreateContainerIfNotExistsAsync(config.AzureCosmosDB.BenchmarkDetailsContainer, "/id");
 
-    List<BenchmarkDetail> benchmarkHeaders = new List<BenchmarkDetail>();
+//    var sqlQuery = "SELECT c.id, c.Name, c.FullName, c.LastRunVersion FROM c";
 
-    while (queryResultSetIterator.HasMoreResults)
-    {
-        FeedResponse<BenchmarkDetail> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+//    QueryDefinition queryDefinition = new QueryDefinition(sqlQuery);
 
-        foreach (var benchmarkHeader in currentResultSet)
-        {
-            benchmarkHeaders.Add(benchmarkHeader);
-        }
-    }
+//    FeedIterator<BenchmarkDetail> queryResultSetIterator = benchmarkDetailsContainer.GetItemQueryIterator<BenchmarkDetail>(queryDefinition);
 
-    return benchmarkHeaders;
-}
+//    List<BenchmarkDetail> benchmarkHeaders = new List<BenchmarkDetail>();
 
-List<BenchmarkDetail> GetAllBenchmarkDetailsInCodebaseViaReflection()
-{
-    Type referenceTypeForReflection = typeof(IReflectionReferenceInterface);
+//    while (queryResultSetIterator.HasMoreResults)
+//    {
+//        FeedResponse<BenchmarkDetail> currentResultSet = await queryResultSetIterator.ReadNextAsync();
 
-    List<Type> benchmarks = referenceTypeForReflection.Assembly.GetTypes().Where(type => type.IsClass && type.GetCustomAttributes(false).Any(attr => attr.GetType().Equals(typeof(VersionAttribute)))).ToList();
+//        foreach (var benchmarkHeader in currentResultSet)
+//        {
+//            benchmarkHeaders.Add(benchmarkHeader);
+//        }
+//    }
 
-    List<BenchmarkDetail> benchmarkHeaders = new List<BenchmarkDetail>();
+//    return benchmarkHeaders;
+//}
 
-    foreach(Type benchmarkType in benchmarks)
-    {
-        benchmarkHeaders.Add(new BenchmarkDetail
-        {
-            Id = GetGuid(benchmarkType.Name).ToString(),
-            Name = benchmarkType.Name,
-            FullName = benchmarkType.FullName,
-            LastRunVersion = ((VersionAttribute)benchmarkType.GetCustomAttributes(false).First(attr => attr.GetType().Equals(typeof(VersionAttribute)))).Version,
-            Type = benchmarkType
-        });
-    }
+//List<BenchmarkDetail> GetAllBenchmarkDetailsInCodebaseViaReflection()
+//{
+//    Type referenceTypeForReflection = typeof(IReflectionReferenceInterface);
 
-    return benchmarkHeaders;
-}
+//    List<Type> benchmarks = referenceTypeForReflection.Assembly.GetTypes().Where(type => type.IsClass && type.GetCustomAttributes(false).Any(attr => attr.GetType().Equals(typeof(VersionAttribute)))).ToList();
 
-Guid GetGuid(string input)
-{
-    using (MD5 md5 = MD5.Create())
-    {
-        byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
-        return new Guid(hash);
-    }
-}
+//    List<BenchmarkDetail> benchmarkHeaders = new List<BenchmarkDetail>();
 
-class BenchmarkDetail
-{
-    [JsonProperty(PropertyName = "id")]
-    public string Id { get; set; }
+//    foreach(Type benchmarkType in benchmarks)
+//    {
+//        benchmarkHeaders.Add(new BenchmarkDetail
+//        {
+//            Id = GetGuid(benchmarkType.Name).ToString(),
+//            Name = benchmarkType.Name,
+//            FullName = benchmarkType.FullName,
+//            LastRunVersion = ((VersionAttribute)benchmarkType.GetCustomAttributes(false).First(attr => attr.GetType().Equals(typeof(VersionAttribute)))).Version,
+//            Type = benchmarkType
+//        });
+//    }
 
-    public string? Name { get; set; }
+//    return benchmarkHeaders;
+//}
 
-    public string? FullName { get; set; }
+//Guid GetGuid(string input)
+//{
+//    using (MD5 md5 = MD5.Create())
+//    {
+//        byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+//        return new Guid(hash);
+//    }
+//}
 
-    public int LastRunVersion { get; set; }
+//class BenchmarkDetail
+//{
+//    [JsonProperty(PropertyName = "id")]
+//    public string Id { get; set; }
 
-    public Type? Type { get; set; }
+//    public string? Name { get; set; }
 
-    public List<BenchmarkSummary>? Results { get; set; }
-}
+//    public string? FullName { get; set; }
 
-class BenchmarkSummary
-{
-    public int Version { get; set; }
+//    public int LastRunVersion { get; set; }
 
-    public BenchmarkDotNet.Reports.Summary? Summary { get; set; }
-}
+//    public Type? Type { get; set; }
+
+//    public List<BenchmarkSummary>? Results { get; set; }
+//}
+
+//class BenchmarkSummary
+//{
+//    public int Version { get; set; }
+
+//    public string? Summary { get; set; }
+//}

@@ -10,6 +10,7 @@ namespace Benchmarker.Benchmarks
     [SimpleJob(RuntimeMoniker.CoreRt60)]
     [MemoryDiagnoser]
     [MarkdownExporterAttribute.GitHub]
+    [JsonExporterAttribute.Full]
     public class InitialisingEmptyArray
     {
         [Benchmark(Baseline = true)]
