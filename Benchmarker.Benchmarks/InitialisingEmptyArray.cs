@@ -6,8 +6,9 @@ using System;
 namespace Benchmarker.Benchmarks
 {
     [Version(1)]
-    [SimpleJob(RuntimeMoniker.CoreRt50)]
-    [SimpleJob(RuntimeMoniker.CoreRt60)]
+    [SimpleJob(RuntimeMoniker.Net60)]
+    [SimpleJob(RuntimeMoniker.Net70)]
+    [SimpleJob(RuntimeMoniker.Net80)]
     [MemoryDiagnoser]
     [MarkdownExporterAttribute.GitHub]
     [JsonExporterAttribute.Full]
