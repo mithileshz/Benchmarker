@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net48</TargetFrameworks>
 	<ImplicitUsings>false</ImplicitUsings>
 	<Nullable>enable</Nullable>
   </PropertyGroup>
@@ -14,5 +14,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Benchmarker.Core\Benchmarker.Core.csproj" />
   </ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
+		<PackageReference Include="System.Memory" Version="4.5.4" />
+	</ItemGroup>
 
 </Project>

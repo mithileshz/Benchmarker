@@ -2,27 +2,29 @@
 using BenchmarkDotNet.Jobs;
 using Benchmarker.Core;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Benchmarker.Benchmarks
 {
     [Version(1)]
-    [SimpleJob(RuntimeMoniker.CoreRt50)]
-    [SimpleJob(RuntimeMoniker.CoreRt60)]
     [MemoryDiagnoser()]
     [MarkdownExporterAttribute.GitHub]
     [JsonExporterAttribute.Full]
-    public class EmptyString
+    public class FindvFirstOrDefault
     {
+        private static readonly List<int> arr = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
         [Benchmark]
-        public string StringEmpty()
+        public int Find()
         {
-            return string.Empty;
+            return arr.Find(x => x == 10);
         }
 
         [Benchmark]
-        public string StringEmptyWithQuotes()
+        public int FirstOrDefault()
         {
-            return "";
+            return arr.FirstOrDefault(x => x == 10);
         }
     }
 }

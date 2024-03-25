@@ -14,7 +14,7 @@
 using BenchmarkDotNet.Running;
 using Benchmarker.Benchmarks;
 
-var results = BenchmarkRunner.Run<EmptyString>();
+var results = BenchmarkRunner.Run<StreamsComparerBenchmark>();
 
 //var config = GetConfigFromEnvironmentVariables();
 
