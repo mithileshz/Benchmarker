@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 
 namespace Benchmarker.Benchmarks
